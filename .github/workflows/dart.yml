@@ -1,0 +1,45 @@
+name: iOS Debug Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: 🎉 iOS Debug IPA
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+
+      # Install CocoaPods
+      - name: Install iOS pods
+        run: pod install
+        working-directory: ios
+
+      # Build IPA senza firma
+      - name: Build iOS IPA (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      # Prepara Payload per IPA
+      - name: Prepare IPA
+        run: |
+          mkdir -p build/ios/iphoneos/Payload
+          mv build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
+          cd build/ios/iphoneos
+          zip -qq -r -9 FlutterIpaExport.ipa Payload
+
+      # Upload IPA al release di GitHub
+      - name: Upload IPA to Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GH_PAT }}
+          file: build/ios/iphoneos/FlutterIpaExport.ipa
+          tag: v1.0
+          overwrite: true
+          body: "Debug release IPA (no signing)"
