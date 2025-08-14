@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
               : error != null
               ? Text('Errore: $error')
               : Text(
-                  '${client.user.firstName ?? ''} ${client.user.lastName ?? ''}',
+                  '${client.user.firstName ?? 'no'} ${client.user.lastName ?? 'no'}',
                   style: TextStyle(fontSize: 24),
                 ),
         ),
