@@ -79,7 +79,7 @@ class ApiClient {
     }
   }
 
-  Future<bool> _tryAutoLogin() async { 
+  Future<bool> _tryAutoLogin() async {
     // if (user.studentId != null && user.hashedPassword != null) {
     //   try {
     //     final data = await post("/auth/login", {
@@ -105,11 +105,11 @@ class ApiClient {
       "app_code": "CVVS",
     });
 
-    user.studentId = response["student_id"];
+    user.studentId = response["ident"];
     user.token = response["token"];
-    user.firstName = response["first_name"];
-    user.lastName = response["last_name"];
-    user.tokenAP = response["token_ap"];
+    user.firstName = response["firstName"];
+    user.lastName = response["lastName"];
+    user.tokenAP = response["tokenAP"];
     user.expire = DateTime.parse(response["expire"]);
 
     await saveSession();
