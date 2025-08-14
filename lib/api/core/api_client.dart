@@ -8,7 +8,8 @@ class ApiClient {
   final String baseUrl;
   UserModel user = UserModel();
 
-  ApiClient({this.baseUrl = "https://web.spaggiari.eu/rest/v1"});
+  // ApiClient({this.baseUrl = "https://web.spaggiari.eu/rest/v1"});
+  ApiClient({this.baseUrl = "https://web24.spaggiari.eu/rest/v1"});
 
   void setToken(String token) => user.token = token;
 
@@ -126,6 +127,7 @@ class ApiClient {
     if (user.token != null) {
       headers["Z-Auth-token"] = user.token!;
     }
+
 
     return headers;
   }

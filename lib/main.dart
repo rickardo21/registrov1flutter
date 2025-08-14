@@ -1,57 +1,59 @@
-import 'package:flutter/material.dart';
-import 'package:registrov1/api/core/api_client.dart';
-// importa il tuo ApiClient
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:registrov1/pages/HomePage.dart';
+import 'package:registrov1/pages/auth/introPage.dart';
+import 'package:registrov1/pages/splashPage.dart';
+import 'package:registrov1/provider/clientProvider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  ApiClient client = ApiClient();
-  bool loading = true;
-  String? error;
+class _MyAppState extends ConsumerState<MyApp> {
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _loginUser();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    // Carica utente salvato da SharedPreferences
+    final apiClient = ref.read(clientProvider);
+    final user = await apiClient.loadUser();
+
+    if (user != null) {
+        apiClient.user = user;
     }
 
-  Future<void> _loginUser() async {
-    try {
-      await client.login('S9477262T', 'Rickardo@07');
-      setState(() {
-        loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        loading = false;
-        error = e.toString();
-      });
-    }
+    setState(() {
+      _initialized = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text('Profilo Studente')),
-        body: Center(
-          child: loading
-              ? CircularProgressIndicator()
-              : error != null
-              ? Text('Errore: $error')
-              : Text(
-                  '${client.user.firstName ?? 'no'} ${client.user.lastName ?? 'no'}',
-                  style: TextStyle(fontSize: 24),
-                ),
-        ),
-      ),
+    if (!_initialized) {
+      return const CupertinoApp(
+        home: SplashPage(),
+      );
+    }
+
+    final user = ref.read(clientProvider).user;
+
+    return CupertinoApp(
+      debugShowCheckedModeBanner: false,
+      home: user.token != null ? const HomePage() : const IntroPage(),
     );
   }
 }
