@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registrov1/pages/HomePage.dart';
@@ -6,11 +7,7 @@ import 'package:registrov1/pages/splashPage.dart';
 import 'package:registrov1/provider/clientProvider.dart';
 
 void main() {
-  runApp(
-    ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(DevicePreview(builder: (context) => ProviderScope(child: MyApp())));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -33,7 +30,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     final user = await apiClient.loadUser();
 
     if (user != null) {
-        apiClient.user = user;
+      apiClient.user = user;
     }
 
     setState(() {
@@ -44,16 +41,15 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return const CupertinoApp(
-        home: SplashPage(),
-      );
+      return const CupertinoApp(home: SplashPage());
     }
 
     final user = ref.read(clientProvider).user;
 
     return CupertinoApp(
+      color: CupertinoColors.secondarySystemBackground,
       debugShowCheckedModeBanner: false,
-      home: user.token != null ? const HomePage() : const IntroPage(),
+      home: user.token == null ? const HomePage() : const IntroPage(),
     );
   }
 }
